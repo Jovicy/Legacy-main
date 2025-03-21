@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                 <FaInfoCircle className="text-yellow-400" />
                 <span>
                   * Minimum balance of ${MIN_WITHDRAWAL_AMOUNT} required to
-                  withdraw.
+                  make withdrawal.
                 </span>
               </div>
             </motion.div>
