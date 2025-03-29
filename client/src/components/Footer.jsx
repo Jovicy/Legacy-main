@@ -4,9 +4,9 @@ import {
   FaEnvelope,
   FaPhoneAlt,
   FaFacebookF,
-  FaInstagram,
   FaTwitter,
   FaWhatsapp,
+  FaTelegramPlane,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -107,7 +107,8 @@ const Footer = () => {
                   link: "https://www.facebook.com/share/g/18MWHQU6ki/?mibextid=wwXIfr",
                 },
                 { Icon: FaWhatsapp, link: "https://wa.me/13392211218" }, // Updated to WhatsApp icon
-                { Icon: FaTwitter, link: "https://www.twitter.com/" },
+                { Icon: FaEnvelope, link: "mailto:legacyfinancialstrategy@gmail.com" },
+                { Icon: FaTelegramPlane, link: "https://t.me/legacyfinancialstrategies" },
               ].map(({ Icon, link }, index) => (
                 <motion.a
                   key={index}

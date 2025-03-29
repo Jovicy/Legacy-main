@@ -22,6 +22,8 @@ export default {
         "join-bg": "url('./assets/join-bg.jpg')",
         "about-bg": "url('./assets/about-one.jfif')",
         "blog-bg": "url('./assets/blog-header.jfif')",
+        "payment-bg": "url('./assets/payment-2.jpg')",
+        "admin-bg": "url('./assets/payment-3.jpg')",
         "works-gradient":
           "linear-gradient(to right, rgba(59, 130, 246, 0.7), rgba(99, 102, 241, 0.7))",
       },

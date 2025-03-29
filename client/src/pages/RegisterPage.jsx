@@ -23,7 +23,7 @@ const RegisterPage = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      navigate("/admin");
+      navigate("/user-dashboard");
     }
   }, [navigate]);
 

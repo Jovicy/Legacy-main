@@ -1,128 +1,76 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import Swal from "sweetalert2";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { FaHome, FaUsers } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid"; // Importing UUID for unique transaction IDs
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import { FaHome, FaWallet, FaMoneyBillWave, FaInfoCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [balance, setBalance] = useState(0);
-  const [transactions, setTransactions] = useState([]);
+  const [email, setEmail] = useState("");
+  const [amount, setAmount] = useState("");
+  const [details, setDetails] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const MIN_WITHDRAWAL_AMOUNT = 100; // Minimum balance required for withdrawal
+  const handleAddTransaction = () => {
+    setLoading(true);
 
-  useEffect(() => {
-    let storedUser = JSON.parse(localStorage.getItem("user"));
+    let storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+    let userIndex = storedUsers.findIndex(
+      (u) => u.email.trim() === email.trim()
+    );
 
-    if (!storedUser) {
-      storedUser = {
-        name: "User",
-        balance: 50,
-        transactions: [],
-        hasReceivedBonus: false,
-      };
-      localStorage.setItem("user", JSON.stringify(storedUser));
-    }
-
-    setUser(storedUser);
-    setBalance(storedUser.balance);
-    setTransactions(storedUser.transactions);
-
-    if (!storedUser.hasReceivedBonus) {
-      Swal.fire({
-        title: "Congratulations!",
-        text: `You've been awarded a welcome bonus of $50!`,
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-
-      const newBalance = 50;
-      const transactionHistory = [
-        {
-          date: new Date().toLocaleDateString(),
-          transactionId: "WELCOME-BONUS",
-          amount: 50,
-          details: "Welcome Bonus",
-          postBalance: newBalance,
-        },
-      ];
-
-      const updatedUser = {
-        ...storedUser,
-        balance: newBalance,
-        transactions: transactionHistory,
-        hasReceivedBonus: true,
-      };
-
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      setBalance(newBalance);
-      setTransactions(transactionHistory);
-    }
-  }, []);
-
-  const handleWithdrawal = () => {
-    if (balance < MIN_WITHDRAWAL_AMOUNT) {
-      Swal.fire({
-        title: "Insufficient Balance",
-        text: `You need at least $${MIN_WITHDRAWAL_AMOUNT} to withdraw.`,
-        icon: "warning",
-        confirmButtonText: "OK",
-      });
+    if (userIndex === -1) {
+      setLoading(false);
+      Swal.fire("Error", "User not found!", "error");
       return;
     }
 
-    Swal.fire({
-      title: "Withdrawal Request",
-      text: "Your withdrawal request has been received. Processing may take 24-48 hours.",
-      icon: "success",
-      confirmButtonText: "OK",
-    });
+    let user = storedUsers[userIndex];
+    let transactionAmount = parseFloat(amount);
 
-    const newBalance = balance - MIN_WITHDRAWAL_AMOUNT;
-    const newTransaction = {
-      date: new Date().toLocaleDateString(),
-      transactionId: "WITHDRAW-REQ",
-      amount: -MIN_WITHDRAWAL_AMOUNT,
-      details: "Withdrawal Request",
-      postBalance: newBalance,
+    if (isNaN(transactionAmount) || transactionAmount <= 0) {
+      setLoading(false);
+      Swal.fire("Error", "Invalid transaction amount!", "error");
+      return;
+    }
+
+    let newTransaction = {
+      date: new Date().toLocaleString(),
+      transactionId: `TXN-${uuidv4()}`,
+      amount: transactionAmount.toFixed(2),
+      details: details.trim(),
+      postBalance: (user.balance + transactionAmount).toFixed(2),
     };
 
-    const updatedUser = {
-      ...user,
-      balance: newBalance,
-      transactions: [...transactions, newTransaction],
-    };
+    user.balance += transactionAmount;
+    user.transactions.push(newTransaction);
 
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setBalance(newBalance);
-    setTransactions(updatedUser.transactions);
-  };
+    storedUsers[userIndex] = user;
+    localStorage.setItem("users", JSON.stringify(storedUsers));
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+    setLoading(false);
+    Swal.fire("Success", "Transaction added successfully!", "success");
+
+    setEmail("");
+    setAmount("");
+    setDetails("");
   };
 
   return (
     <>
-      <Navigation handleLogout={handleLogout} />
+      <Navigation />
 
-      {/* Dashboard Header */}
       <motion.section
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="h-[50vh] bg-header-bg bg-cover bg-center flex items-center"
+        className="h-[50vh] bg-admin-bg bg-cover bg-center flex items-center"
       >
         <div className="custom-container flex flex-col gap-3">
-          <h1 className="text-6xl font-bold">
-            Welcome back, {user?.name || "User"}!
+          <h1 className="text-3xl md:text-6xl font-bold">
+            Welcome back, Admin!
           </h1>
           <div className="flex items-center gap-1">
             <FaHome />
@@ -130,124 +78,72 @@ const AdminDashboard = () => {
               <Link to="/" className="text-button-light-color font-semibold">
                 Home
               </Link>{" "}
-              - Dashboard
+              - Admin
             </p>
           </div>
         </div>
       </motion.section>
 
-      {/* Main Dashboard */}
-      <section className="py-20 bg-black">
-        <div className="custom-container flex flex-col gap-20">
-          {/* Balance and Withdrawal Section */}
-          <div className="flex flex-wrap justify-between items-center gap-y-5">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center"
-            >
-              <div className="flex flex-col gap-1">
-                <h3 className="text-sm font-semibold">Total Balance</h3>
-                <p>${balance}</p>
-              </div>
-              <div className="bg-black h-full p-4 rounded-md">
-                <FaWallet />
-              </div>
-            </motion.div>
+      <section className="p-6 bg-black">
 
-            {/* Withdrawal Option */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="md:w-30s w-full bg-gray-900 p-6 rounded-2xl shadow-lg text-white flex flex-col items-center gap-4"
-            >
-              {/* Wallet Icon and Title */}
-              <div className="flex items-center gap-3">
-                <FaMoneyBillWave className="text-green-400 text-3xl" />
-                <h3 className="text-lg font-semibold">Withdraw Funds</h3>
-              </div>
+        <div>
+          <h2 className="text-2xl font-bold mb-8">Admin Dashboard</h2>
+        </div>
 
-              {/* Withdrawal Amount & Balance Info */}
-              <div className="text-center">
-                <p className="text-sm text-gray-300">Available Balance:</p>
-                <p className="text-2xl font-bold text-green-400">${balance}</p>
-              </div>
-
-              {/* Withdrawal Button */}
-              <button
-                onClick={handleWithdrawal}
-                disabled={balance < MIN_WITHDRAWAL_AMOUNT}
-                className={`w-full px-5 py-3 rounded-lg font-semibold text-white transition ${
-                  balance < MIN_WITHDRAWAL_AMOUNT
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-green-500 hover:bg-green-700"
-                }`}
-              >
-                Withdraw $50
-              </button>
-
-              {/* Note About Withdrawal Requirement */}
-              <div className="text-xs text-gray-400 flex items-center gap-2">
-                <FaInfoCircle className="text-yellow-400" />
-                <span>
-                  * Minimum balance of ${MIN_WITHDRAWAL_AMOUNT} required to
-                  make withdrawal.
-                </span>
-              </div>
-            </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center mb-8"
+        >
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm font-semibold">Total Users</h3>
+            <p>100</p>
           </div>
+          <div className="bg-black h-full p-4 rounded-md">
+            <FaUsers />
+          </div>
+        </motion.div>
 
-          {/* Transaction History */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg">
+          <input
+            type="email"
+            placeholder="Enter user email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value.trim())}
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <input
+            type="number"
+            placeholder="Enter transaction amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.trim())}
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <input
+            type="text"
+            placeholder="Enter transaction details"
+            value={details}
+            onChange={(e) => setDetails(e.target.value.trim())}
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <button
+            onClick={handleAddTransaction}
+            className={`p-2 rounded text-white bg-button-light-color w-full ${
+              loading
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-button-light-color hover:bg-blue-600"
+            }`}
+            disabled={loading}
           >
-            <table className="w-full rounded-lg shadow-button-light-color shadow-md overflow-x-auto">
-              <thead className="bg-button-light-color">
-                <tr className="bg-gray-100 text-left">
-                  <th className="px-6 py-4 rounded-tl-lg">Date</th>
-                  <th className="px-6 py-4">Transaction ID</th>
-                  <th className="px-6 py-4">Amount</th>
-                  <th className="px-6 py-4">Details</th>
-                  <th className="px-6 py-4 rounded-tr-lg">Post Balance</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.length > 0 ? (
-                  transactions.map((transaction, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 border border-button-light-color text-sm">
-                        {transaction.date}
-                      </td>
-                      <td className="px-6 py-4 border border-button-light-color text-sm text-button-light-color">
-                        {transaction.transactionId}
-                      </td>
-                      <td className="px-6 py-4 border border-button-light-color text-sm">
-                        ${transaction.amount}
-                      </td>
-                      <td className="px-6 py-4 border border-button-light-color text-sm">
-                        {transaction.details}
-                      </td>
-                      <td className="px-6 py-4 border border-button-light-color text-sm">
-                        ${transaction.postBalance}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center py-4">
-                      No transactions yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </motion.div>
+            {loading ? "Processing..." : "Add Transaction"}
+          </button>
         </div>
       </section>
+
       <Footer />
     </>
   );

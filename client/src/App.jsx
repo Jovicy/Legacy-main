@@ -13,6 +13,7 @@ import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import UserDashboard from "./pages/UserDashboard";
 import Forbidden from "./pages/Forbidden";
 import ForgetPassword from "./pages/ForgetPassword";
 import BlogPage from "./pages/BlogPage";
@@ -26,15 +27,19 @@ function App() {
   const hiddenPaths = [
     "/login",
     "/register",
-    "/admin",
+    "/admin-dashboard",
+    "/user-dashboard",
     "/forget-password",
     "/contact",
     "/about",
     "/blog",
     "/payment",
+    "/not-found"
   ];
 
-  const hideHeaderFooter = hiddenPaths.includes(location.pathname);
+  const hideHeaderFooter = hiddenPaths.some((path) =>
+    location.pathname.startsWith(path) || location.pathname.match(/^\/blog\/\d+$/)
+  );
 
   return (
     <>
@@ -65,13 +70,14 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/blog/:blogId" element={<BlogDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/not-found" element={<Forbidden />} />
 
-        {/* 404 Page */}
-        <Route path="" element={<Navigate to="/not-found" replace />} />
+        {/* 404 Page Redirect */}
+        <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Routes>
     </>
   );

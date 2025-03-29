@@ -23,7 +23,7 @@ const LoginPage = () => {
           await axios.get(`${API_BASE_URL}/api/auth/verify-token`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          navigate("/admin");
+          navigate("/user-dashboard");
         } catch (error) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
@@ -56,7 +56,7 @@ const LoginPage = () => {
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       toast.success("Login Successful!");
-      setTimeout(() => navigate("/admin"), 1000);
+      setTimeout(() => navigate("/user-dashboard"), 1000);
     } catch (err) {
       const errorMessage = err.response?.data?.message || "An error occurred. Please try again!";
       toast.error(errorMessage);

@@ -5,8 +5,36 @@ import { FaHome, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import contactImage from "../assets/contact-us-bg.png";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
+import Swal from "sweetalert2";
 
 const ContactPage = () => {
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    formData.append("access_key", "2d89a257-b872-4d07-8374-e19a6e3c87f2");
+
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: json,
+    }).then((res) => res.json());
+
+    if (res.success) {
+      Swal.fire({
+        title: "Good job!",
+        text: "Message Sent Sucessfully!",
+        icon: "success",
+      });
+    }
+  };
+
   return (
     <>
       <Navigation />
@@ -77,7 +105,8 @@ const ContactPage = () => {
                 <h3 className="text-2xl">Visit Us</h3>
                 <div>
                   <p>
-                    Legacy Strategy 4567 Oakridge Drive, Denver, Colorado, United States
+                    Legacy Strategy 4567 Oakridge Drive, Denver, Colorado,
+                    United States
                   </p>
                 </div>
               </div>
@@ -97,6 +126,7 @@ const ContactPage = () => {
             <img src={contactImage} alt="contact-img" className="rounded-lg" />
           </motion.div>
           <motion.form
+            onSubmit={onSubmit}
             className="md:w-1/2 w-full flex flex-col gap-5"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -115,11 +145,15 @@ const ContactPage = () => {
                   type="text"
                   placeholder="Full Name"
                   className="outline-none w-full py-3 px-6 border-2 border-button-light-color rounded-md bg-subBlack"
+                  required
+                  name="name"
                 />
                 <input
                   type="email"
                   placeholder="Email Address"
                   className="outline-none w-full py-3 px-6 border-2 border-button-light-color rounded-md bg-subBlack"
+                  required
+                  name="email"
                 />
               </div>
               <div>
@@ -127,14 +161,14 @@ const ContactPage = () => {
                   placeholder="Message"
                   className="outline-none w-full py-3 px-6 border-2 border-button-light-color rounded-md bg-subBlack"
                   rows={5}
+                  required
+                  name="message"
                 ></textarea>
               </div>
             </div>
-            <div>
-              <button className="py-3 px-6 bg-button-light-color rounded-md uppercase font-semibold">
+              <button className="py-3 px-6 bg-button-light-color rounded-md uppercase font-semibold" type="submit">
                 Send Message
               </button>
-            </div>
           </motion.form>
         </div>
       </section>

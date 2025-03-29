@@ -1,10 +1,10 @@
 import {
   FaHeadphones,
   FaEnvelope,
+  FaRegUser,
   FaGlobe,
   FaFacebookSquare,
-  FaRegUser,
-  FaInstagramSquare,
+  FaTelegramPlane,
   FaWhatsappSquare,
   FaBars,
   FaTimes,
@@ -44,8 +44,13 @@ const Navigation = () => {
               <FaHeadphones />
               <p className="font-semibold">Support</p>
             </div>
-            <a href="mailto:legacyfinancialstrategy@gmail.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-              <FaEnvelope/>
+            <a
+              href="mailto:legacyfinancialstrategy@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              <FaEnvelope />
               info@legacyfinancestrategies.com
             </a>
           </div>
@@ -57,11 +62,26 @@ const Navigation = () => {
             >
               <FaFacebookSquare className="text-white hover:text-button-light-color h-6 w-6" />
             </a>
-            <a href="https://wa.me/13392211218" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://wa.me/13392211218"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <FaWhatsappSquare className="text-white hover:text-button-light-color h-6 w-6" />
             </a>
-            <a href="mailto:legacyfinancialstrategy@gmail.com" target="_blank" rel="noopener noreferrer">
+            <a
+              href="mailto:legacyfinancialstrategy@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <FaEnvelope className="text-white hover:text-button-light-color h-6 w-6" />
+            </a>
+            <a
+              href="https://t.me/legacyfinancialstrategies"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTelegramPlane className="text-white hover:text-button-light-color h-6 w-6" />
             </a>
           </div>
         </div>
@@ -77,16 +97,55 @@ const Navigation = () => {
         <div className="custom-container flex items-center justify-between">
           {/* Logo */}
           <div className="w-20">
-            <img src={Logo} alt="logo" className="rounded-full border-2 border-button-light-color" />
+            <img
+              src={Logo}
+              alt="logo"
+              className="rounded-full border-2 border-button-light-color"
+            />
           </div>
 
           {/* Nav list */}
           <ul className={`lg:flex hidden items-center gap-5`}>
-            <li><Link to="/" className="font-semibold hover:text-button-light-color">Home</Link></li>
-            <li><Link to="/payment" className="font-semibold hover:text-button-light-color">Payment</Link></li>
-            <li><Link to="/about" className="font-semibold hover:text-button-light-color">About Us</Link></li>
-            <li><Link to="/blog" className="font-semibold hover:text-button-light-color">Blog</Link></li>
-            <li><Link to="/contact" className="font-semibold hover:text-button-light-color">Contact Us</Link></li>
+            <li>
+              <Link
+                to="/"
+                className="font-semibold hover:text-button-light-color"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/payment"
+                className="font-semibold hover:text-button-light-color"
+              >
+                Payment
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about"
+                className="font-semibold hover:text-button-light-color"
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/blog"
+                className="font-semibold hover:text-button-light-color"
+              >
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact"
+                className="font-semibold hover:text-button-light-color"
+              >
+                Contact Us
+              </Link>
+            </li>
           </ul>
 
           {/* Menu Button for Mobile */}
@@ -98,12 +157,18 @@ const Navigation = () => {
 
           {/* nav-btn */}
           <div className="hidden lg:flex gap-3 items-center">
-            {location.pathname === "/admin" ? (
-              <button onClick={handleLogout} className="bg-red-600 p-3 rounded-md cursor-pointer text-white hover:bg-red-700">
+            {location.pathname === "/user-dashboard" ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 p-3 rounded-md cursor-pointer text-white hover:bg-red-700"
+              >
                 <FaSignOutAlt className="text-base" />
               </button>
             ) : (
-              <Link to="/login" className="bg-button-light-color p-3 rounded-md cursor-pointer">
+              <Link
+                to="/login"
+                className="bg-button-light-color p-3 rounded-md cursor-pointer"
+              >
                 <FaRegUser />
               </Link>
             )}
@@ -115,6 +180,90 @@ const Navigation = () => {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="lg:hidden bg-white text-black py-5 px-4 flex flex-col items-center gap-4"
+          >
+            <ul className="flex flex-col items-center gap-5">
+              <li>
+                <Link
+                  to="/"
+                  onClick={toggleMenu}
+                  className="font-semibold hover:text-button-light-color"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/payment"
+                  onClick={toggleMenu}
+                  className="font-semibold hover:text-button-light-color"
+                >
+                  Payment
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about"
+                  onClick={toggleMenu}
+                  className="font-semibold hover:text-button-light-color"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/blog"
+                  onClick={toggleMenu}
+                  className="font-semibold hover:text-button-light-color"
+                >
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  onClick={toggleMenu}
+                  className="font-semibold hover:text-button-light-color"
+                >
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+
+            {/* Mobile Auth Button (Login/Logout) */}
+            <div className="flex gap-3 items-center">
+              {location.pathname === "/user-dashboard" ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 p-3 rounded-md cursor-pointer text-button-light-color hover:bg-red-700"
+                >
+                  <FaSignOutAlt className="text-base" />
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="bg-button-light-color p-3 rounded-md cursor-pointer"
+                >
+                  <FaRegUser className="text-base" />
+                </Link>
+              )}
+              <div>
+                <button className="flex items-center gap-2 rounded-md border-2 border-button-light-color p-2 text-button-light-color">
+                  <FaGlobe />
+                  <p>Eng</p>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </>
   );
