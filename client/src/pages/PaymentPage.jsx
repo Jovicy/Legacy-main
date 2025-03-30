@@ -18,6 +18,12 @@ const PaymentPage = () => {
     BNB: "0x8481e735686a8C59521D949AfF9b99DE48035865",
   };
 
+  const qrImages = {
+    BTC: "/btc.JPG",
+    ETH: "/eth.JPG",
+    BNB: "/bnb.JPG",
+  };
+
   const handlePayment = (e) => {
     e.preventDefault();
     if (amount > 0) {
@@ -128,9 +134,6 @@ const PaymentPage = () => {
               <motion.form
                 onSubmit={handlePayment}
                 className="flex flex-col gap-4"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <label className="font-bold text-lg">
                   Select Cryptocurrency
@@ -138,7 +141,7 @@ const PaymentPage = () => {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 bg-subBlack"
+                  className="p-2 border rounded-md bg-subBlack"
                 >
                   <option value="BTC">Bitcoin (BTC)</option>
                   <option value="ETH">Ethereum (ETH)</option>
@@ -150,7 +153,7 @@ const PaymentPage = () => {
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 bg-subBlack"
+                  className="p-2 border rounded-md bg-subBlack"
                   placeholder="Enter amount"
                 />
 
@@ -165,20 +168,14 @@ const PaymentPage = () => {
               </motion.form>
 
               {showQR && (
-                <motion.div
-                  className="mt-8 text-center flex flex-col items-center justify-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div className="mt-8 text-center flex flex-col items-center justify-center">
                   <p className="font-bold text-lg mb-2">
                     Scan QR Code or Use Wallet Address for {currency}
                   </p>
-                  <QRCodeCanvas
-                    value={`${currency.toLowerCase()}:${
-                      walletAddresses[currency]
-                    }?amount=${amount}`}
-                    size={200}
+                  <img
+                    src={qrImages[currency]}
+                    alt={`${currency} QR Code`}
+                    className="w-full h-full"
                   />
                   <p className="mt-4 font-mono text-sm bg-gray-100 p-2 rounded-md">
                     {walletAddresses[currency]}
