@@ -49,7 +49,8 @@ const Modal = ({ isOpen, onClose }) => {
     if (urlParams.get("submitted") === "true") {
       Swal.fire({
         title: "Thank You!",
-        text: "Your proof of payment has been submitted successfully.",
+        html: `Your proof of payment has been submitted successfully. <br /><br />
+               For faster processing or further assistance, please do well to reach out to the <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: underline;">Management Team</a>.`,
         icon: "success",
       });
     }
@@ -71,7 +72,7 @@ const Modal = ({ isOpen, onClose }) => {
           <input
             type="hidden"
             name="_next"
-            value="https://legacyfinancestrategies.com/payment?submitted=true"
+            value="http://localhost:5173/payment?submitted=true"
           />
           <input
             type="hidden"
