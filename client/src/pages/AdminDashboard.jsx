@@ -21,6 +21,8 @@ const AdminDashboard = () => {
       (u) => u.email.trim() === email.trim()
     );
 
+    console.log(userIndex);
+
     if (userIndex === -1) {
       setLoading(false);
       Swal.fire("Error", "User not found!", "error");

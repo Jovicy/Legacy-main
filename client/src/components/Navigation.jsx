@@ -63,7 +63,7 @@ const Navigation = () => {
               <FaFacebookSquare className="text-white hover:text-button-light-color h-6 w-6" />
             </a>
             <a
-              href="https://wa.me/13392211218"
+              href="https://wa.me/17153157565"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -82,7 +82,7 @@ const ContactPage = () => {
               <div className="flex flex-col gap-5">
                 <h3 className="text-2xl">Call Us</h3>
                 <div>
-                  <p>+1 (339) 221-1218</p>
+                  <p>+1 (715) 315‑7565</p>
                 </div>
               </div>
             </div>

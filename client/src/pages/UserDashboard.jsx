@@ -26,7 +26,7 @@ const UserDashboard = () => {
     if (!storedUser) {
       storedUser = {
         name: "User",
-        balance: 150,
+        balance: 0,
         transactions: [],
         hasReceivedBonus: false,
       };
@@ -45,12 +45,12 @@ const UserDashboard = () => {
         confirmButtonText: "OK",
       });
 
-      const newBalance = 150;
+      const newBalance = 0;
       const transactionHistory = [
         {
           date: new Date().toLocaleDateString(),
           transactionId: "WELCOME-BONUS",
-          amount: 150,
+          amount: 0,
           details: "Welcome Bonus",
           postBalance: newBalance,
         },
@@ -97,7 +97,7 @@ const UserDashboard = () => {
       transactionId: "WITHDRAW-REQ",
       amount: -MIN_WITHDRAWAL_AMOUNT,
       details: "Withdrawal Request",
-      postBalance: newBalance,
+      postBalance: balance,
     };
 
     const updatedUser = {

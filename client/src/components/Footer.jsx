@@ -98,7 +98,7 @@ const Footer = () => {
             </div>
             <div className="flex gap-3 md:items-start items-center md:justify-start justify-center">
               <FaPhoneAlt className="h-5 w-5" />
-              <p>+1 (339) 221-1218</p>
+              <p>+1 (715) 315‑7565</p>
             </div>
             <div className="flex gap-5 items-center md:justify-start justify-center">
               {[
@@ -106,9 +106,15 @@ const Footer = () => {
                   Icon: FaFacebookF,
                   link: "https://www.facebook.com/share/g/18MWHQU6ki/?mibextid=wwXIfr",
                 },
-                { Icon: FaWhatsapp, link: "https://wa.me/13392211218" }, // Updated to WhatsApp icon
-                { Icon: FaEnvelope, link: "mailto:legacyfinancialstrategy@gmail.com" },
-                { Icon: FaTelegramPlane, link: "https://t.me/legacyfinancialstrategies" },
+                { Icon: FaWhatsapp, link: "https://wa.me/17153157565" }, // Updated to WhatsApp icon
+                {
+                  Icon: FaEnvelope,
+                  link: "mailto:legacyfinancialstrategy@gmail.com",
+                },
+                {
+                  Icon: FaTelegramPlane,
+                  link: "https://t.me/legacyfinancialstrategies",
+                },
               ].map(({ Icon, link }, index) => (
                 <motion.a
                   key={index}
