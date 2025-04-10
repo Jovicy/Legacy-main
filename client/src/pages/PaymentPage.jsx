@@ -72,7 +72,7 @@ const Modal = ({ isOpen, onClose }) => {
           <input
             type="hidden"
             name="_next"
-            value="http://localhost:5173/payment?submitted=true"
+            value="https://legacyfinancestrategies.com/payment?submitted=true"
           />
           <input
             type="hidden"
