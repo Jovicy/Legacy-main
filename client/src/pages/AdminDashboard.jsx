@@ -87,7 +87,6 @@ const AdminDashboard = () => {
       </motion.section>
 
       <section className="p-6 bg-black">
-
         <div>
           <h2 className="text-2xl font-bold mb-8">Admin Dashboard</h2>
         </div>
@@ -107,7 +106,8 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
 
-        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg">
+        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
+          <h2>Credit Transaction</h2>
           <input
             type="email"
             placeholder="Enter user email"
@@ -135,6 +135,54 @@ const AdminDashboard = () => {
           <button
             onClick={handleAddTransaction}
             className={`p-2 rounded text-white bg-button-light-color w-full ${
+              loading
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-button-light-color hover:bg-blue-600"
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Add Transaction"}
+          </button>
+        </div>
+
+        {/* Withdrawal table transaction */}
+        {/* Credit Transaction */}
+        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
+          <h2>Credit Transaction</h2>
+
+          <input
+            type="email"
+            placeholder="Enter user email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value.trim())}
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <input
+            type="number"
+            placeholder="Enter transaction amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.trim())}
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <select
+            className="border p-2 rounded w-full text-button-light-color bg-black"
+          >
+            <option value="">Select transaction type</option>
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+
+          <input
+            type="text"
+            placeholder="Enter description (e.g., withdrawal)"
+            className="border p-2 rounded w-full text-button-light-color"
+          />
+
+          <button
+            onClick={handleAddTransaction}
+            className={`p-2 rounded text-white w-full ${
               loading
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-button-light-color hover:bg-blue-600"
