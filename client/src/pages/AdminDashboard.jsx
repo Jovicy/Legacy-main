@@ -148,7 +148,7 @@ const AdminDashboard = () => {
         {/* Withdrawal table transaction */}
         {/* Credit Transaction */}
         <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
-          <h2>Credit Transaction</h2>
+          <h2>Withdrawal Transaction</h2>
 
           <input
             type="email"
