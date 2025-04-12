@@ -17,6 +17,7 @@ const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
 
   const MIN_WITHDRAWAL_AMOUNT = 100; // Minimum balance required for withdrawal
 
@@ -45,12 +46,12 @@ const UserDashboard = () => {
         confirmButtonText: "OK",
       });
 
-      const newBalance = 0;
+      const newBalance = 100;
       const transactionHistory = [
         {
           date: new Date().toLocaleDateString(),
           transactionId: "WELCOME-BONUS",
-          amount: 0,
+          amount: 100,
           details: "Welcome Bonus",
           postBalance: newBalance,
         },
@@ -83,32 +84,60 @@ const UserDashboard = () => {
 
     Swal.fire({
       title: "Withdrawal Request",
-      html: `Your withdrawal request has been received. Processing may take 24-48 hours. 
-             For faster processing, please reach out to the 
-             <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">management team</a> 
-             or an <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">administrator</a>.`,
+      html: `Your withdrawal request has been received and is now processing.<br/><br/>
+            <small>For faster processing, please reach out to the 
+            <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">management team</a>.</small>`,
       icon: "success",
       confirmButtonText: "OK",
     });
 
-    const newBalance = balance - MIN_WITHDRAWAL_AMOUNT;
-    const newTransaction = {
+    const processingTransaction = {
+      id: Date.now(),
       date: new Date().toLocaleDateString(),
       transactionId: "WITHDRAW-REQ",
       amount: -MIN_WITHDRAWAL_AMOUNT,
-      details: "Withdrawal Request",
+      details: "Withdrawal Request - Processing",
       postBalance: balance,
+      status: "processing", // new field
     };
 
+    const updatedTransactions = [...transactions, processingTransaction];
     const updatedUser = {
       ...user,
-      balance: newBalance,
-      transactions: [...transactions, newTransaction],
+      transactions: updatedTransactions,
     };
 
     localStorage.setItem("user", JSON.stringify(updatedUser));
-    setBalance(newBalance);
-    setTransactions(updatedUser.transactions);
+    setUser(updatedUser);
+    setTransactions(updatedTransactions);
+
+    // Simulate backend confirmation after 5 seconds
+    setTimeout(() => {
+      const confirmedTransactions = updatedTransactions.map((tx) =>
+        tx.id === processingTransaction.id
+          ? {
+              ...tx,
+              details: "Withdrawal Completed",
+              postBalance: balance - MIN_WITHDRAWAL_AMOUNT,
+              status: "completed",
+            }
+          : tx
+      );
+
+      const newBalance = balance - MIN_WITHDRAWAL_AMOUNT;
+
+      const confirmedUser = {
+        ...user,
+        balance: newBalance,
+        transactions: confirmedTransactions,
+      };
+
+      localStorage.setItem("user", JSON.stringify(confirmedUser));
+      setUser(confirmedUser);
+      setBalance(newBalance);
+      setWithdrawAmount(0);
+      setTransactions(confirmedTransactions);
+    }, 5000); // Simulated 5 sec delay
   };
 
   const handleLogout = () => {
@@ -210,20 +239,38 @@ const UserDashboard = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center"
+              className="md:w-2/5 w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center"
             >
               <div className="flex flex-col gap-1">
                 <h3 className="text-sm font-semibold">Withdraw Funds</h3>
-                <p>${balance}</p>
-                <p className="text-xs text-gray-500 flex items-start gap-1">
-                  <FaInfoCircle className="h-4 w-4" /> Minimum balance of $
-                  {MIN_WITHDRAWAL_AMOUNT} required to withdraw.
+                <div className="flex items-center gap-1">
+                  <p className="text-lg font-bold">${withdrawAmount}</p>
+                  <span className="text-xs text-gray-400">(Selected)</span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[25, 50, 75, 100].map((percent) => (
+                    <button
+                      key={percent}
+                      className="text-xs bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700"
+                      onClick={() =>
+                        setWithdrawAmount(Math.floor((balance * percent) / 100))
+                      }
+                    >
+                      {percent}%
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-xs text-gray-500 flex items-start gap-1 mt-2">
+                  <FaInfoCircle className="h-4 w-4" /> Minimum withdrawal is $
+                  {MIN_WITHDRAWAL_AMOUNT}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleWithdrawal}
-                  disabled={balance < MIN_WITHDRAWAL_AMOUNT}
+                  disabled={withdrawAmount < MIN_WITHDRAWAL_AMOUNT}                  
                   className={`px-4 py-2 rounded-lg font-semibold text-white flex items-center gap-2 transition ${
                     balance < MIN_WITHDRAWAL_AMOUNT
                       ? "bg-gray-600 cursor-not-allowed"
@@ -269,6 +316,11 @@ const UserDashboard = () => {
                         </td>
                         <td className="px-6 py-4 border border-button-light-color text-sm">
                           {transaction.details}
+                          {transaction.status === "processing" && (
+                            <span className="ml-2 px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                              Processing
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4 border border-button-light-color text-sm">
                           ${transaction.postBalance}
