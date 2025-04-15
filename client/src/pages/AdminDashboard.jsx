@@ -1,79 +1,98 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
 import { FaHome, FaUsers } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid"; // Importing UUID for unique transaction IDs
+import { Link, useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import api from "../api";
+import { toast, ToastContainer } from "react-toastify";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [users, setUsers] = useState(null);
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleAddTransaction = () => {
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await api.get(`/users`);
+      setTotalUsers(response.data.results);
+      setUsers(response.data.data.users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+
+    if (storedUser && storedUser._id && storedUser.role === "admin") {
+      fetchUsers();
+    } else {
+      localStorage.clear();
+      navigate("/login");
+    }
+  }, [navigate, fetchUsers]);
+
+  const handleAddTransaction = async () => {
     setLoading(true);
 
-    let storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    let userIndex = storedUsers.findIndex(
-      (u) => u.email.trim() === email.trim()
-    );
-
-    console.log(userIndex);
-
-    if (userIndex === -1) {
+    if (!email) {
+      toast.error("Please enter a valid email.");
       setLoading(false);
-      Swal.fire("Error", "User not found!", "error");
       return;
     }
 
-    let user = storedUsers[userIndex];
-    let transactionAmount = parseFloat(amount);
+    const user = users.find((user) => user.email === email);
 
-    if (isNaN(transactionAmount) || transactionAmount <= 0) {
+    if (!user) {
+      toast.error("User with email not found.");
       setLoading(false);
-      Swal.fire("Error", "Invalid transaction amount!", "error");
       return;
     }
 
-    let newTransaction = {
-      date: new Date().toLocaleString(),
-      transactionId: `TXN-${uuidv4()}`,
-      amount: transactionAmount.toFixed(2),
-      details: details.trim(),
-      postBalance: (user.balance + transactionAmount).toFixed(2),
-    };
+    if (!amount || isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount.");
+      setLoading(false);
+      return;
+    }
 
-    user.balance += transactionAmount;
-    user.transactions.push(newTransaction);
+    try {
+      const transactionData = {
+        userId: user._id,
+        amount: amount,
+        type: "credit",
+        description: details,
+      };
 
-    storedUsers[userIndex] = user;
-    localStorage.setItem("users", JSON.stringify(storedUsers));
+      const response = await api.post("/transaction/add", transactionData);
 
-    setLoading(false);
-    Swal.fire("Success", "Transaction added successfully!", "success");
-
-    setEmail("");
-    setAmount("");
-    setDetails("");
+      if (response.status === 201) {
+        toast.success("Transaction added successfully.");
+      } else {
+        toast.error("Failed to add transaction.");
+      }
+    } catch (error) {
+      toast.error("Error adding transaction. Please try again.");
+    } finally {
+      setLoading(false);
+      setEmail("");
+      setAmount("");
+      setDetails("");
+    }
   };
 
   return (
     <>
       <Navigation />
-
-      <motion.section
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="h-[50vh] bg-admin-bg bg-cover bg-center flex items-center"
-      >
+      <ToastContainer />
+      <motion.section initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="h-[50vh] bg-admin-bg bg-cover bg-center flex items-center">
         <div className="custom-container flex flex-col gap-3">
-          <h1 className="text-3xl md:text-6xl font-bold">
-            Welcome back, Admin!
-          </h1>
+          <h1 className="text-3xl md:text-6xl font-bold">Welcome back, Admin!</h1>
           <div className="flex items-center gap-1">
             <FaHome />
             <p>
@@ -95,34 +114,20 @@ const AdminDashboard = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center mb-8"
-        >
+          className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center mb-8">
           <div className="flex flex-col gap-1">
             <h3 className="text-sm font-semibold">Total Users</h3>
-            <p>100</p>
+            <p>{totalUsers}</p>
           </div>
           <div className="bg-black h-full p-4 rounded-md">
             <FaUsers />
           </div>
         </motion.div>
 
-        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
-          <h2>Credit Transaction</h2>
-          <input
-            type="email"
-            placeholder="Enter user email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
+        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg">
+          <input type="email" placeholder="Enter user email" value={email} onChange={(e) => setEmail(e.target.value.trim())} className="border p-2 rounded w-full text-button-light-color" />
 
-          <input
-            type="number"
-            placeholder="Enter transaction amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
+          <input type="number" placeholder="Enter transaction amount" value={amount} onChange={(e) => setAmount(e.target.value.trim())} className="border p-2 rounded w-full text-button-light-color" />
 
           <input
             type="text"
@@ -134,61 +139,8 @@ const AdminDashboard = () => {
 
           <button
             onClick={handleAddTransaction}
-            className={`p-2 rounded text-white bg-button-light-color w-full ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-button-light-color hover:bg-blue-600"
-            }`}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Add Transaction"}
-          </button>
-        </div>
-
-        {/* Withdrawal table transaction */}
-        {/* Credit Transaction */}
-        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
-          <h2>Withdrawal Transaction</h2>
-
-          <input
-            type="email"
-            placeholder="Enter user email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <input
-            type="number"
-            placeholder="Enter transaction amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <select
-            className="border p-2 rounded w-full text-button-light-color bg-black"
-          >
-            <option value="">Select transaction type</option>
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Enter description (e.g., withdrawal)"
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <button
-            onClick={handleAddTransaction}
-            className={`p-2 rounded text-white w-full ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-button-light-color hover:bg-blue-600"
-            }`}
-            disabled={loading}
-          >
+            className={`p-2 rounded text-white bg-button-light-color w-full ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-button-light-color hover:bg-blue-600"}`}
+            disabled={loading}>
             {loading ? "Processing..." : "Add Transaction"}
           </button>
         </div>

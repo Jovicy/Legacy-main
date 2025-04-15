@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
-// API Base URL from environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -47,14 +44,16 @@ const RegisterPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/signup`, {
+      const response = await api.post(`/signup`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
-      toast.success("Registration Successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
+      if (response.data) {
+        toast.success(response.data.message);
+        setTimeout(() => navigate("/login"), 2000);
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || "An error occurred. Please try again!");
     }
@@ -116,11 +115,7 @@ const RegisterPage = () => {
                     placeholder="8+ Characters"
                     className="w-full px-6 py-3 text-sm border-2 border-button-light-color rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none bg-subBlack"
                   />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute right-4 top-3 text-gray-400 hover:text-white"
-                  >
+                  <button type="button" onClick={togglePasswordVisibility} className="absolute right-4 top-3 text-gray-400 hover:text-white">
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
@@ -139,22 +134,14 @@ const RegisterPage = () => {
                     placeholder="Confirm your password"
                     className="w-full px-6 py-3 text-sm border-2 border-button-light-color rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none bg-subBlack"
                   />
-                  <button
-                    type="button"
-                    onClick={toggleConfirmPasswordVisibility}
-                    className="absolute right-4 top-3 text-gray-400 hover:text-white"
-                  >
+                  <button type="button" onClick={toggleConfirmPasswordVisibility} className="absolute right-4 top-3 text-gray-400 hover:text-white">
                     {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
 
               {/* Register Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-4 py-3 mt-4 text-white bg-button-light-color rounded-lg"
-              >
+              <button type="submit" disabled={loading} className="w-full px-4 py-3 mt-4 text-white bg-button-light-color rounded-lg">
                 {loading ? "Registering..." : "Register"}
               </button>
             </form>

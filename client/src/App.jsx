@@ -24,22 +24,9 @@ function App() {
   const location = useLocation();
 
   // Pages that should NOT show header/footer
-  const hiddenPaths = [
-    "/login",
-    "/register",
-    "/admin-dashboard",
-    "/user-dashboard",
-    "/forget-password",
-    "/contact",
-    "/about",
-    "/blog",
-    "/payment",
-    "/not-found"
-  ];
+  const hiddenPaths = ["/login", "/register", "/admin-dashboard", "/user-dashboard", "/forget-password", "/contact", "/about", "/blog", "/payment", "/not-found"];
 
-  const hideHeaderFooter = hiddenPaths.some((path) =>
-    location.pathname.startsWith(path) || location.pathname.match(/^\/blog\/\d+$/)
-  );
+  const hideHeaderFooter = hiddenPaths.some((path) => location.pathname.startsWith(path) || location.pathname.match(/^\/blog\/\d+$/));
 
   return (
     <>
@@ -74,6 +61,7 @@ function App() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/blog/:blogId" element={<BlogDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+
         <Route path="/not-found" element={<Forbidden />} />
 
         {/* 404 Page Redirect */}
