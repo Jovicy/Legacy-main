@@ -1,21 +1,156 @@
 import React, { useState } from "react";
-import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
 import Navigation from "../components/Navigation";
 import { Link } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import Footer from "../components/Footer";
 import paymentBg from "../assets/payment-image.jpg";
+import { useEffect } from "react";
+import Swal from "sweetalert2";
+
+const Modal = ({ isOpen, onClose }) => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const form = event.target;
+
+    const fileInput = form.querySelector('input[name="proof"]');
+    const file = fileInput?.files?.[0];
+
+    if (file) {
+      const fileSizeKB = file.size / 1024;
+      if (fileSizeKB > 1000) {
+        Swal.fire({
+          title: "File Too Large",
+          text: "Please upload a file less than 1 MB",
+          icon: "warning",
+        });
+        return;
+      }
+    }
+
+    Swal.fire({
+      title: "Submitting...",
+      text: "Please wait while we process your form",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    // Let form submit natively (so file upload works)
+    setTimeout(() => {
+      Swal.close();
+      form.submit();
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("submitted") === "true") {
+      Swal.fire({
+        title: "Thank You!",
+        html: `Your proof of payment has been submitted successfully. <br /><br />
+               For faster processing or further assistance, please do well to reach out to the <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: underline;">Management Team</a>.`,
+        icon: "success",
+      });
+    }
+  }, []);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-subBlack p-6 rounded-md shadow-md w-11/12 md:w-1/3">
+        <h2 className="text-xl font-bold mb-4">Verify Payment</h2>
+        <form
+          action="https://formsubmit.co/legacyfinancialstrategy@gmail.com"
+          method="POST"
+          encType="multipart/form-data"
+          className="flex flex-col gap-2"
+          onSubmit={handleSubmit}
+        >
+          <input
+            type="hidden"
+            name="_next"
+            value="https://legacyfinancestrategies.com/payment?submitted=true"
+          />
+          <input
+            type="hidden"
+            name="_subject"
+            value="New Payment Verification Submission"
+          />
+          <input type="hidden" name="_template" value="box" />
+
+          <div className="flex flex-col mb-2 gap-1">
+            <label>Transaction ID:</label>
+            <input
+              type="text"
+              className="border-button-light-color border-2 rounded-lg p-2 w-full bg-black"
+              name="transaction_id"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col mb-2 gap-1">
+            <label>Amount Sent:</label>
+            <input
+              type="number"
+              className="border-button-light-color border-2 rounded-lg p-2 w-full bg-black"
+              name="amount"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col mb-2 gap-1">
+            <label>Upload Proof of Payment:</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="border-button-light-color border-2 rounded-lg p-2 w-full bg-black"
+              name="proof"
+              required
+            />
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <button
+              type="button"
+              className="bg-black text-white py-2 px-4 rounded-md mr-2"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-button-light-color text-white py-2 px-4 rounded-md"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const PaymentPage = () => {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("BTC");
   const [showQR, setShowQR] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const walletAddresses = {
-    BTC: "bc1q9tcu5yth5dt5d9k8gkl7pypnkevsu98fvsvyf2",
-    ETH: "0x8481e735686a8C59521D949AfF9b99DE48035865",
-    BNB: "0x8481e735686a8C59521D949AfF9b99DE48035865",
+    BTC: "bc1qauymew6lx8hehh6lvy497lktc8hvhw7xq4ds7w",
+    ETH: "0x78f673272f80e0db1628f4653De38B2F6C0a6773",
+    BNB: "0x78f673272f80e0db1628f4653De38B2F6C0a6773",
+    USDT_TRC20: "TGxDYBd6noQXJ1PMNYWeJrjr9HUQcFjP9x",
+  };
+
+  const qrImages = {
+    BTC: "/bitcoin.JPG",
+    ETH: "/ethereum.JPG",
+    BNB: "/bnbs.JPG",
+    USDT_TRC20: "/tron.JPG",
   };
 
   const handlePayment = (e) => {
@@ -51,6 +186,8 @@ const PaymentPage = () => {
           </div>
         </div>
       </motion.section>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       <motion.section
         className="bg-black py-16"
@@ -128,9 +265,6 @@ const PaymentPage = () => {
               <motion.form
                 onSubmit={handlePayment}
                 className="flex flex-col gap-4"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <label className="font-bold text-lg">
                   Select Cryptocurrency
@@ -138,11 +272,14 @@ const PaymentPage = () => {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 bg-subBlack"
+                  className="p-2 border rounded-md bg-subBlack"
                 >
                   <option value="BTC">Bitcoin (BTC)</option>
                   <option value="ETH">Ethereum (ETH)</option>
                   <option value="BNB">Binance Coin (BNB)</option>
+                  <option value="USDT_TRC20">
+                    Tether USD (USDT) - TRC20 Network
+                  </option>
                 </select>
 
                 <label className="font-bold text-lg">Enter Amount</label>
@@ -150,7 +287,7 @@ const PaymentPage = () => {
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 bg-subBlack"
+                  className="p-2 border rounded-md bg-subBlack"
                   placeholder="Enter amount"
                 />
 
@@ -165,20 +302,14 @@ const PaymentPage = () => {
               </motion.form>
 
               {showQR && (
-                <motion.div
-                  className="mt-8 text-center flex flex-col items-center justify-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div className="mt-8 text-center flex flex-col items-center justify-center">
                   <p className="font-bold text-lg mb-2">
                     Scan QR Code or Use Wallet Address for {currency}
                   </p>
-                  <QRCodeCanvas
-                    value={`${currency.toLowerCase()}:${
-                      walletAddresses[currency]
-                    }?amount=${amount}`}
-                    size={200}
+                  <img
+                    src={qrImages[currency]}
+                    alt={`${currency} QR Code`}
+                    className="w-full h-full rounded-3xl"
                   />
                   <p className="mt-4 font-mono text-sm bg-gray-100 p-2 rounded-md">
                     {walletAddresses[currency]}
@@ -186,6 +317,14 @@ const PaymentPage = () => {
                   <p className="text-xs text-gray-600 mt-2">
                     Ensure you send exactly {amount} {currency}.
                   </p>
+                  <div className="mt-2">
+                    <button
+                      className="bg-button-light-color py-2 px-4 rounded-lg font-bold"
+                      onClick={() => setIsModalOpen(true)} // Open modal on click
+                    >
+                      Verify Payment
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </motion.div>
@@ -255,6 +394,17 @@ const PaymentPage = () => {
                 </p>
                 <p className="w-full break-all font-mono text-sm mt-2">
                   {walletAddresses.BNB}
+                </p>
+              </div>
+              <div className="bg-black p-4 rounded-md shadow-md w-full md:text-nowrap text-wrap">
+                <h3 className="text-xl font-bold">
+                  Tether USD (USDT) - TRC20 Network
+                </h3>
+                <p className="text-gray-600">
+                  Send Tether USD (USDT) to the address provided below.
+                </p>
+                <p className="w-full break-all font-mono text-sm mt-2">
+                  {walletAddresses.USDT_TRC20}
                 </p>
               </div>
             </motion.div>
