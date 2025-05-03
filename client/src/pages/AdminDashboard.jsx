@@ -28,9 +28,7 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
-      : null;
+    const storedUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
 
     if (storedUser && storedUser._id && storedUser.role === "admin") {
       fetchUsers();
@@ -92,16 +90,9 @@ const AdminDashboard = () => {
     <>
       <Navigation />
       <ToastContainer />
-      <motion.section
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="h-[50vh] bg-admin-bg bg-cover bg-center flex items-center"
-      >
+      <motion.section initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="h-[50vh] bg-admin-bg bg-cover bg-center flex items-center">
         <div className="custom-container flex flex-col gap-3">
-          <h1 className="text-3xl md:text-6xl font-bold">
-            Welcome back, Admin!
-          </h1>
+          <h1 className="text-3xl md:text-6xl font-bold">Welcome back, Admin!</h1>
           <div className="flex items-center gap-1">
             <FaHome />
             <p>
@@ -123,8 +114,7 @@ const AdminDashboard = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center mb-8"
-        >
+          className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center mb-8">
           <div className="flex flex-col gap-1">
             <h3 className="text-sm font-semibold">Total Users</h3>
             <p>{totalUsers}</p>
@@ -137,21 +127,9 @@ const AdminDashboard = () => {
         <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
           <h2>Credit Transaction</h2>
 
-          <input
-            type="email"
-            placeholder="Enter user email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
+          <input type="email" placeholder="Enter user email" value={email} onChange={(e) => setEmail(e.target.value.trim())} className="border p-2 rounded w-full text-button-light-color" />
 
-          <input
-            type="number"
-            placeholder="Enter transaction amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
+          <input type="number" placeholder="Enter transaction amount" value={amount} onChange={(e) => setAmount(e.target.value.trim())} className="border p-2 rounded w-full text-button-light-color" />
 
           <input
             type="text"
@@ -163,57 +141,8 @@ const AdminDashboard = () => {
 
           <button
             onClick={handleAddTransaction}
-            className={`p-2 rounded text-white bg-button-light-color w-full ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-button-light-color hover:bg-blue-600"
-            }`}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Add Transaction"}
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
-          <h2>Withdrawal Transaction</h2>
-
-          <input
-            type="email"
-            placeholder="Enter user email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <input
-            type="number"
-            placeholder="Enter transaction amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.trim())}
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <select className="border p-2 rounded w-full text-button-light-color bg-black">
-            <option value="">Select transaction type</option>
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Enter description (e.g., withdrawal)"
-            className="border p-2 rounded w-full text-button-light-color"
-          />
-
-          <button
-            onClick={handleAddTransaction}
-            className={`p-2 rounded text-white w-full ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-button-light-color hover:bg-blue-600"
-            }`}
-            disabled={loading}
-          >
+            className={`p-2 rounded text-white bg-button-light-color w-full ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-button-light-color hover:bg-blue-600"}`}
+            disabled={loading}>
             {loading ? "Processing..." : "Add Transaction"}
           </button>
         </div>
