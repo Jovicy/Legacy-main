@@ -175,7 +175,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex flex-col gap-4 bg-subBlack p-6 shadow-md rounded-lg mb-8">
-          <h2>Withdrawal Transaction</h2>
+          <h2>Table Transaction</h2>
 
           <input
             type="email"

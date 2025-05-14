@@ -108,7 +108,7 @@ const Footer = () => {
                 },
                 { Icon: FaWhatsapp, link: "https://wa.me/17153157565" }, // Updated to WhatsApp icon
                 { Icon: FaEnvelope, link: "mailto:legacyfinancialstrategy@gmail.com" },
-                { Icon: FaTelegramPlane, link: "https://t.me/legacyfinancialstrategies" },
+                { Icon: FaTelegramPlane, link: "https://t.me/legacyfinancialstrategy" },
               ].map(({ Icon, link }, index) => (
                 <motion.a
                   key={index}

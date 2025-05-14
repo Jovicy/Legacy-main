@@ -77,7 +77,7 @@ const Navigation = () => {
               <FaEnvelope className="text-white hover:text-button-light-color h-6 w-6" />
             </a>
             <a
-              href="https://t.me/legacyfinancialstrategies"
+              href="https://t.me/legacyfinancialstrategy"
               target="_blank"
               rel="noopener noreferrer"
             >

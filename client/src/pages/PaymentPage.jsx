@@ -140,17 +140,17 @@ const PaymentPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const walletAddresses = {
-    BTC: "bc1qauymew6lx8hehh6lvy497lktc8hvhw7xq4ds7w",
-    ETH: "0x78f673272f80e0db1628f4653De38B2F6C0a6773",
-    BNB: "0x78f673272f80e0db1628f4653De38B2F6C0a6773",
-    USDT_TRC20: "TGxDYBd6noQXJ1PMNYWeJrjr9HUQcFjP9x",
+    BTC: "bc1q9tcu5yth5dt5d9k8gkl7pypnkevsu98fvsvyf2",
+    ETH: "0x8481e735686a8C59521D949AfF9b99DE48035865",
+    BNB: "0x8481e735686a8C59521D949AfF9b99DE48035865",
+    USDT_TRC20: "TGfWoHUkSvBXV1qJ8cB9bsgZGtt6tatQAV",
   };
 
   const qrImages = {
-    BTC: "/bitcoin.JPG",
-    ETH: "/ethereum.JPG",
-    BNB: "/bnbs.JPG",
-    USDT_TRC20: "/tron.JPG",
+    BTC: "/btc.jpeg",
+    ETH: "/eth.jpeg",
+    BNB: "/bnb.jpeg",
+    USDT_TRC20: "/usdt.jpeg",
   };
 
   const handlePayment = (e) => {
@@ -311,9 +311,16 @@ const PaymentPage = () => {
                     alt={`${currency} QR Code`}
                     className="w-full h-full rounded-3xl"
                   />
-                  <p className="mt-4 font-mono text-sm bg-gray-100 p-2 rounded-md">
+                  <p
+                    className="mt-4 font-mono text-sm bg-gray-100 p-2 rounded-md cursor-pointer hover:bg-gray-200"
+                    onClick={() => {
+                      navigator.clipboard.writeText(walletAddresses[currency]);
+                      alert("Wallet address copied to clipboard!");
+                    }}
+                  >
                     {walletAddresses[currency]}
                   </p>
+
                   <p className="text-xs text-gray-600 mt-2">
                     Ensure you send exactly {amount} {currency}.
                   </p>
