@@ -3,12 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import {
-  FaHome,
-  FaWallet,
-  FaMoneyBillWave,
-  FaInfoCircle,
-} from "react-icons/fa";
+import { FaHome, FaWallet, FaMoneyBillWave, FaInfoCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../api";
@@ -25,9 +20,7 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const storedUser = localStorage.getItem("user")
-        ? JSON.parse(localStorage.getItem("user"))
-        : null;
+      const storedUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
 
       try {
         if (storedUser && storedUser._id && storedUser.role === "user") {
@@ -66,35 +59,34 @@ const UserDashboard = () => {
       return;
     }
 
-    Swal.fire({
-      title: "Withdrawal Request",
-      html: `Your withdrawal request has been received. Processing may take 24-48 hours. 
-             For faster processing, please reach out to the 
-             <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">management team</a> 
-             or an <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">administrator</a>.`,
-      icon: "success",
-      confirmButtonText: "OK",
-    });
-
     try {
       const response = await api.post(`/transaction/add`, {
         userId: user._id,
-        amount: user.totalTransactionAmount,
+        amount: withdrawAmount,
         type: "debit",
         description: "withdrawal",
       });
 
       if (response.data.status === "success") {
-        toast.success("Transaction added successfully!");
+        Swal.fire({
+          title: "Withdrawal Request",
+          html: `Your withdrawal request has been received. Processing may take 24-48 hours.
+             For faster processing, please reach out to the
+             <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">management team</a>
+             or an <a href="https://t.me/legacyfinancialstrategies" target="_blank" style="color: #3085d6; text-decoration: none;">administrator</a>.`,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
 
         setTransactions((prevTransactions) => [
           response.data.data, // Add the new transaction at the top
           ...prevTransactions,
         ]);
 
-        setBalance(0);
+        setBalance(user.totalTransactionAmount - withdrawAmount);
+        setWithdrawAmount(0);
       } else {
-        toast.error("Failed to add transaction.");
+        toast.error("Failed to withdraw transaction.");
       }
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -140,16 +132,9 @@ const UserDashboard = () => {
       <Navigation handleLogout={handleLogout} />
       <ToastContainer />
       {/* Dashboard Header */}
-      <motion.section
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="h-[50vh] bg-header-bg bg-cover bg-center flex items-center"
-      >
+      <motion.section initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="h-[50vh] bg-header-bg bg-cover bg-center flex items-center">
         <div className="custom-container flex flex-col gap-3">
-          <h1 className="text-3xl md:text-6xl font-bold">
-            Welcome back, {user?.name || "User"}!
-          </h1>
+          <h1 className="text-3xl md:text-6xl font-bold">Welcome back, {user?.name || "User"}!</h1>
           <div className="flex items-center gap-1">
             <FaHome />
             <p>
@@ -171,8 +156,7 @@ const UserDashboard = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center"
-            >
+              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center">
               <div className="flex flex-col gap-1">
                 <h3 className="text-sm font-semibold">Total Balance</h3>
                 <p>${balance}</p>
@@ -185,8 +169,7 @@ const UserDashboard = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center"
-            >
+              className="md:w-30s w-full bg-button-light-color p-5 rounded-lg flex justify-between items-center">
               <div className="flex flex-col gap-1">
                 <h3 className="text-sm font-semibold">Withdraw Funds</h3>
                 <div className="flex items-center gap-1">
@@ -196,21 +179,14 @@ const UserDashboard = () => {
 
                 <div className="flex flex-wrap gap-2 mt-2">
                   {[25, 50, 75, 100].map((percent) => (
-                    <button
-                      key={percent}
-                      className="text-xs bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700"
-                      onClick={() =>
-                        setWithdrawAmount(Math.floor((balance * percent) / 100))
-                      }
-                    >
+                    <button key={percent} className="text-xs bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700" onClick={() => setWithdrawAmount(Math.floor((balance * percent) / 100))}>
                       {percent}%
                     </button>
                   ))}
                 </div>
 
                 <p className="text-xs text-gray-500 flex items-start gap-1 mt-2">
-                  <FaInfoCircle className="h-4 w-4" /> Minimum withdrawal is $
-                  {MIN_WITHDRAWAL_AMOUNT}
+                  <FaInfoCircle className="h-4 w-4" /> Minimum withdrawal is ${MIN_WITHDRAWAL_AMOUNT}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -218,11 +194,8 @@ const UserDashboard = () => {
                   onClick={handleWithdrawal}
                   disabled={withdrawAmount < MIN_WITHDRAWAL_AMOUNT}
                   className={`px-4 py-2 rounded-lg font-semibold text-white flex items-center gap-2 transition ${
-                    balance < MIN_WITHDRAWAL_AMOUNT
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-700"
-                  }`}
-                >
+                    balance < MIN_WITHDRAWAL_AMOUNT ? "bg-gray-600 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
+                  }`}>
                   <FaMoneyBillWave /> Withdraw
                 </button>
               </div>
@@ -230,12 +203,7 @@ const UserDashboard = () => {
           </div>
 
           {/* Transaction History */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="w-full overflow-x-auto"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="w-full overflow-x-auto">
             <table className="w-full rounded-lg shadow-button-light-color shadow-md overflow-x-auto">
               <thead className="bg-button-light-color">
                 <tr className="bg-gray-100 text-left">
@@ -251,51 +219,29 @@ const UserDashboard = () => {
                   <>
                     {transactions.map((transaction, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 border border-button-light-color text-sm">
-                          {new Date(transaction.createdAt).toLocaleDateString(
-                            "en-US"
-                          )}
-                        </td>
-                        <td className="px-6 py-4 border border-button-light-color text-sm text-button-light-color">
-                          {transaction._id}
-                        </td>
-                        <td className="px-6 py-4 border border-button-light-color text-sm ">
-                          {transaction.type}
-                        </td>
-                        <td className="px-6 py-4 border border-button-light-color text-sm">
-                          {transaction.description}
-                        </td>
-                        <td className="px-6 py-4 border border-button-light-color text-sm">
-                          ${Math.abs(transaction.amount)}
-                        </td>
+                        <td className="px-6 py-4 border border-button-light-color text-sm">{new Date(transaction.createdAt).toLocaleDateString("en-US")}</td>
+                        <td className="px-6 py-4 border border-button-light-color text-sm text-button-light-color">{transaction._id}</td>
+                        <td className="px-6 py-4 border border-button-light-color text-sm ">{transaction.type}</td>
+                        <td className="px-6 py-4 border border-button-light-color text-sm">{transaction.description}</td>
+                        <td className="px-6 py-4 border border-button-light-color text-sm">${Math.abs(transaction.amount)}</td>
                       </tr>
                     ))}
 
                     {/* ✅ Only one Mining Profit row at the end */}
                     <tr className="bg-gray-50">
-                      <td
-                        colSpan="5"
-                        className="px-6 py-4 text-sm text-center border border-button-light-color"
-                      >
+                      <td colSpan="5" className="px-6 py-4 text-sm text-center border border-button-light-color">
                         <strong>Bitcoin Mining Profit (Every 6 Hours):</strong>
                         <div className="mt-2 flex flex-wrap gap-2 justify-center">
-                          {transactions.some(
-                            (t) => t.miningProfits && t.miningProfits.length > 0
-                          ) ? (
+                          {transactions.some((t) => t.miningProfits && t.miningProfits.length > 0) ? (
                             transactions
                               .flatMap((t) => t.miningProfits || [])
                               .map((profit, i) => (
-                                <span
-                                  key={i}
-                                  className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs"
-                                >
+                                <span key={i} className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs">
                                   {profit.time}: ${profit.amount} BTC
                                 </span>
                               ))
                           ) : (
-                            <span className="text-gray-500">
-                              No mining profit recorded for today yet.
-                            </span>
+                            <span className="text-gray-500">No mining profit recorded for today yet.</span>
                           )}
                         </div>
                       </td>
